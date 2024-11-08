@@ -122,14 +122,14 @@ export default function useVirtualList ({
       const virtualFrontSpaceEl = virtualFrontSpace as HTMLElement
       const isFirst = virtualItems[0].index === 0;
       virtualFrontSpaceEl.style.height = isFirst ? `0px` : `${virtualItems[0].start}px`;
-      virtualFrontSpaceEl.style.visibility = isFirst ? 'hidden' : 'visible';
+      virtualFrontSpaceEl.style.display = isFirst ? 'none' : 'block';
     }
 
     if (virtualItems[virtualItems.length - 1] && virtualItems[virtualItems.length - 1]._ref) {
       const virtualBackSpaceEl = virtualBackSpace as HTMLElement
       const isLast = virtualItems[virtualItems.length - 1].index === count - 1;
       virtualBackSpaceEl.style.height = isLast ? `0px` : `${totalHeight - virtualItems[virtualItems.length - 1].end}px`
-      virtualBackSpaceEl.style.visibility = isLast ? 'hidden' : 'visible';
+      virtualBackSpaceEl.style.display = isLast ? 'none' : 'block';
     }
   }, [virtualItems, count, totalHeight, container, virtualFrontSpace, virtualBackSpace])
 
