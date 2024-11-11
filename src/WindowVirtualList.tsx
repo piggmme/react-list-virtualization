@@ -17,7 +17,8 @@ const LoremIpsums = [
 const mockData = Array.from({ length: 1000 }, (_, i) => i + LoremIpsums[i % LoremIpsums.length])
 
 export default function WindowVirtualList () {
-  const [text, setText] = useState('')
+  const [newText, setNewText] = useState('')
+  const [text, setText] = useState(mockData[0])
   const [list, setList] = useState(mockData)
   const [index, setIndex] = useState(0)
 
@@ -34,13 +35,24 @@ export default function WindowVirtualList () {
   return (
     <div>
       <h2>Window</h2>
-      <div>
-        <textarea value={text} onChange={e => setText(e.target.value)} />
-        <button onClick={() => setList(prev => [text, ...prev])}>submit</button>
+      <div style={{ backgroundColor: '#eee', width: '300px', padding: '16px', margin: '10px' }}>
+        <h3>Add new list item</h3>
+        <textarea value={newText} onChange={e => setNewText(e.target.value)} />
+        <button onClick={() => setList(prev => [newText, ...prev])}>add</button>
       </div>
 
-      <div>
-        <input type='number' value={index} onChange={e => setIndex(Number(e.target.value))} />
+      <div style={{ backgroundColor: '#eee', width: '300px', padding: '16px', margin: '10px' }}>
+        <h3>Update Certain list item</h3>
+        index: <input
+          type='number'
+          value={index}
+          onChange={(e) => {
+            setIndex(Number(e.target.value))
+            setText(list[Number(e.target.value)])
+          }}
+               />
+        <br />
+        <br />
         <textarea value={text} onChange={e => setText(e.target.value)} />
         <button onClick={() => setList((prev) => {
           const next = prev.slice()
@@ -49,10 +61,6 @@ export default function WindowVirtualList () {
         })}
         >update
         </button>
-      </div>
-
-      <div style={{ paddingBottom: '60px' }}>
-        This is a test of list virtualization in window. The list below should be able to handle a large number of items without slowing down.
       </div>
 
       <List list={list} />
@@ -69,12 +77,13 @@ function List ({ list }: { list: typeof mockData }) {
 
   return (
     <div>
-      <div>
+      <div style={{ backgroundColor: '#eee', width: '300px', padding: '16px', margin: '10px' }}>
+        <h3>Move to certain list item</h3>
         hash: <input type='number' value={hash} onChange={e => setHash(Number(e.target.value))} />
         <button onClick={() => {
           moveTo(item => item.index === hash)
         }}
-        >이동
+        >move
         </button>
       </div>
       <div
