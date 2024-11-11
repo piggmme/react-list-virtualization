@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import {
+  useCallback, useEffect, useLayoutEffect, useMemo, useState,
+} from 'react'
 import { flushSync } from 'react-dom'
 
 const OVER_SCAN = 5
@@ -151,14 +153,14 @@ export default function useWindowVirtualList ({
       const virtualFrontSpace = container._virtualFrontSpace as HTMLElement
       const isFirst = virtualItems[0].index === 0
       virtualFrontSpace.style.height = isFirst ? `0px` : `${virtualItems[0].start}px`
-      virtualFrontSpace.style.display = isFirst ? 'none' : 'block';
+      virtualFrontSpace.style.display = isFirst ? 'none' : 'block'
     }
 
     if (virtualItems[virtualItems.length - 1]) {
       const virtualBackSpace = container._virtualBackSpace as HTMLElement
       const isLast = virtualItems[virtualItems.length - 1].index === count - 1
       virtualBackSpace.style.height = isLast ? `0px` : `${totalHeight - virtualItems[virtualItems.length - 1].end}px`
-      virtualBackSpace.style.display = isLast ? 'none' : 'block';
+      virtualBackSpace.style.display = isLast ? 'none' : 'block'
     }
   }, [virtualItems, count, totalHeight, container])
 
@@ -182,7 +184,6 @@ export default function useWindowVirtualList ({
 
     setVirtualItems(overScanedVirtualItems)
   }
-
 
   const moveTo = (condition: (item: VirtualListItem) => boolean) => {
     const target = findItem(condition)

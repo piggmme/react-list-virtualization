@@ -42,14 +42,14 @@ export default function WindowVirtualList () {
       <div>
         <input type='number' value={index} onChange={e => setIndex(Number(e.target.value))} />
         <textarea value={text} onChange={e => setText(e.target.value)} />
-        <button onClick={() => setList(prev => {
+        <button onClick={() => setList((prev) => {
           const next = prev.slice()
           next[index] = text
           return next
-        })}>update</button>
+        })}
+        >update
+        </button>
       </div>
-
-
 
       <div style={{ paddingBottom: '60px' }}>
         This is a test of list virtualization in window. The list below should be able to handle a large number of items without slowing down.
@@ -62,7 +62,9 @@ export default function WindowVirtualList () {
 }
 
 function List ({ list }: { list: typeof mockData }) {
-  const { containerRef, measureElement, totalHeight, virtualItems, moveTo } = useWindowVirtualList({ count: list.length, gap: 10 })
+  const {
+    containerRef, measureElement, totalHeight, virtualItems, moveTo,
+  } = useWindowVirtualList({ count: list.length, gap: 10 })
   const [hash, setHash] = useState<number>(0)
 
   return (
@@ -71,7 +73,9 @@ function List ({ list }: { list: typeof mockData }) {
         hash: <input type='number' value={hash} onChange={e => setHash(Number(e.target.value))} />
         <button onClick={() => {
           moveTo(item => item.index === hash)
-        }}>이동</button>
+        }}
+        >이동
+        </button>
       </div>
       <div
         style={{
@@ -146,30 +150,31 @@ function NomalList ({ list }: { list: typeof mockData }) {
   }, [])
   return (
     <div
-    style={{
-      width: '600px',
-      overflow: 'auto',
-      border: '1px solid black',
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '10px',
-    }}
-  >
-    {list.map((text, index) => (
-      <div
-        key={index}
-        ref={measureElement}
-        style={{
-          border: '1px solid red',
-          padding: '10px',
-          position: 'relative',
-          minHeight: '100px',
-        }}
-      >
-        <h2>{index}.</h2>
-        {list[index]}
-      </div>))}
-  </div>
+      style={{
+        width: '600px',
+        overflow: 'auto',
+        border: '1px solid black',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+      }}
+    >
+      {list.map((text, index) => (
+        <div
+          key={index}
+          ref={measureElement}
+          style={{
+            border: '1px solid red',
+            padding: '10px',
+            position: 'relative',
+            minHeight: '100px',
+          }}
+        >
+          <h2>{index}.</h2>
+          {list[index]}
+        </div>
+      ))}
+    </div>
   )
 }
