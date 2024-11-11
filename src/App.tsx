@@ -3,7 +3,7 @@ import WindowVirtualList from './WindowVirtualList'
 import StaticVirtualList from './StaticVirtualList'
 
 export default function App () {
-  const [tab, setTab] = useState<'window' | 'static'>('static')
+  const [tab, setTab] = useState<'window' | 'static'>('window')
   return (
     <div>
       <h1>List Vitualization</h1>

@@ -1,15 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 
 const OVER_SCAN = 5
 
-// TODO: index 아니고 고유한 key를 가지도록 수정 필요...
-type VirtualListItem = {
+type MeasuredItem = {
   index: number
   size: number
-  start: number
-  end: number
   _ref?: Element | null
 }
+
+type VirtualListItem = {
+  start: number
+  end: number
+} & MeasuredItem
 
 type VirtualListProps = {
   count: number
@@ -38,6 +40,7 @@ export default function useWindowVirtualList ({
     _virtualFrontSpace: null,
     _virtualBackSpace: null,
   })
+
   const containerRef = useCallback((node: Element | null | undefined) => {
     if (node) {
       // Create virtual space
@@ -61,37 +64,56 @@ export default function useWindowVirtualList ({
   }, [])
 
   const [totalHeight, setTotalHeight] = useState(0)
-  const defaultItems = useMemo(() => Array.from({ length: count }, (_, i) => ({
-    index: i,
-    size: 0,
-    start: 0,
-    end: 0,
-    _ref: null,
-  })), [count])
-  const [items, setItems] = useState<VirtualListItem[]>(defaultItems)
-  const [virtualItems, setVirtualItems] = useState<VirtualListItem[]>(defaultItems)
+  const defaultItems = useMemo(() => Array.from({ length: count }, (_, index) => (createVirtualItem(index))), [count])
+  const [measuredItems, setMeasuredItems] = useState<MeasuredItem[]>([])
+  const [items, setItems] = useState<VirtualListItem[]>([])
+  const [virtualItems, setVirtualItems] = useState<VirtualListItem[]>([])
 
-  const measureElement = useCallback((node: Element | null | undefined) => {
+  useLayoutEffect(function updateItems () {
+    setItems(defaultItems)
+    setMeasuredItems(defaultItems)
+    setVirtualItems([])
+  }, [defaultItems])
+
+  const measureElement = (node: Element | null | undefined) => {
     if (!node) return
-    const index = Number((node as HTMLElement).dataset.key)
 
-    setItems((prevItems) => {
-      const size = node.getBoundingClientRect().height
-      const start = index === 0 ? container.offset : prevItems[index - 1].end + gap
-      const end = start + size
-      const _ref = node
+    const index = Number((node as HTMLElement).dataset.index)
+    const size = node.getBoundingClientRect().height
 
+    if (size === 0) return
+    if (measuredItems[index].size === size) return
+
+    setMeasuredItems((prevItems) => {
       const newItems = prevItems.map((item, i) => {
         if (i === index) return {
-          index, size, start, end, _ref,
+          index, size, _ref: node,
         }
         else return item
       })
 
-      setTotalHeight(newItems.reduce((acc, item) => acc + item.size + gap, -gap))
       return newItems
     })
-  }, [container.offset, gap])
+  }
+
+  useEffect(function updateItemsStartEnd () {
+    const newItems = measuredItems.map((item, index) => {
+      const start = measuredItems.slice(0, index).reduce((acc, item) => acc + item.size + gap, container.offset)
+      const end = start + item.size
+
+      return {
+        ...item,
+        start,
+        end,
+      }
+    })
+
+    setItems(newItems)
+  }, [measuredItems, gap, container.offset])
+
+  useEffect(function calculateTotalHeight () {
+    setTotalHeight(items.reduce((acc, item) => acc + item.size + gap, -gap))
+  }, [items, gap])
 
   useEffect(function updateVirtualItems () {
     const handleScroll = () => {
@@ -143,7 +165,7 @@ export default function useWindowVirtualList ({
     containerRef,
     measureElement,
     totalHeight,
-    virtualItems,
+    virtualItems: virtualItems.length === 0 ? items : virtualItems,
   }
 }
 
@@ -165,5 +187,15 @@ function insertAfter (newElement: Element, referenceElement: Element) {
     parent?.insertBefore(newElement, nextSibling)
   } else {
     parent?.appendChild(newElement)
+  }
+}
+
+function createVirtualItem (index: number) {
+  return {
+    index,
+    size: 0,
+    start: 0,
+    end: 0,
+    _ref: null,
   }
 }
