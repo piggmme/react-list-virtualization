@@ -64,7 +64,7 @@
 ```tsx
   const {
     containerRef, measureElement, totalHeight, virtualItems, moveTo,
-  } = useWindowVirtualList({ count: list.length, gap: 10 })\
+  } = useWindowVirtualList({ count: list.length, gap: 10 })
 
   return (
     <div
