@@ -1,4 +1,4 @@
-import { PropsWithChildren, useRef, useState } from 'react'
+import { PropsWithChildren, useState } from 'react'
 import useVirtualList from './useVirtualList'
 
 const LoremIpsums = [
@@ -124,7 +124,7 @@ function List ({ list }: { list: typeof mockData }) {
             </div>
           ))
         }
-      <div ref={virtualBackSpaceRef}></div>
+        <div ref={virtualBackSpaceRef}></div>
       </div>
     </>
   )

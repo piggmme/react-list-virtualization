@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
+import { PropsWithChildren, useCallback, useState } from 'react'
 import useWindowVirtualList from './useWindowVirtualList'
 
 const LoremIpsums = [

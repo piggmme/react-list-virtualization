@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import {
+  useCallback, useEffect, useLayoutEffect, useMemo, useState,
+} from 'react'
 import { flushSync } from 'react-dom'
 
 const OVER_SCAN = 5
@@ -44,13 +46,13 @@ export default function useVirtualList ({
   }, [])
   const [virtualFrontSpace, setVirtualFrontSpace] = useState<Element | null>(null)
   const [virtualBackSpace, setVirtualBackSpace] = useState<Element | null>(null)
-  const virtualFrontSpaceRef =  useCallback((node: Element | null | undefined) => {
-    if (node){
+  const virtualFrontSpaceRef = useCallback((node: Element | null | undefined) => {
+    if (node) {
       setVirtualFrontSpace(node)
       ;(node as HTMLElement).style.flexShrink = '0'
     }
   }, [])
-  const virtualBackSpaceRef =  useCallback((node: Element | null | undefined) => {
+  const virtualBackSpaceRef = useCallback((node: Element | null | undefined) => {
     if (node) {
       setVirtualBackSpace(node)
       ;(node as HTMLElement).style.flexShrink = '0'
@@ -141,16 +143,16 @@ export default function useVirtualList ({
 
     if (virtualItems[0] && virtualItems[0]._ref) {
       const virtualFrontSpaceEl = virtualFrontSpace as HTMLElement
-      const isFirst = virtualItems[0].index === 0;
-      virtualFrontSpaceEl.style.height = isFirst ? `0px` : `${virtualItems[0].start}px`;
-      virtualFrontSpaceEl.style.display = isFirst ? 'none' : 'block';
+      const isFirst = virtualItems[0].index === 0
+      virtualFrontSpaceEl.style.height = isFirst ? `0px` : `${virtualItems[0].start}px`
+      virtualFrontSpaceEl.style.display = isFirst ? 'none' : 'block'
     }
 
     if (virtualItems[virtualItems.length - 1] && virtualItems[virtualItems.length - 1]._ref) {
       const virtualBackSpaceEl = virtualBackSpace as HTMLElement
-      const isLast = virtualItems[virtualItems.length - 1].index === count - 1;
+      const isLast = virtualItems[virtualItems.length - 1].index === count - 1
       virtualBackSpaceEl.style.height = isLast ? `0px` : `${totalHeight - virtualItems[virtualItems.length - 1].end}px`
-      virtualBackSpaceEl.style.display = isLast ? 'none' : 'block';
+      virtualBackSpaceEl.style.display = isLast ? 'none' : 'block'
     }
   }, [virtualItems, count, totalHeight, container, virtualFrontSpace, virtualBackSpace])
 

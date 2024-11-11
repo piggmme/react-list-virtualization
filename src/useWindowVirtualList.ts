@@ -163,7 +163,6 @@ export default function useWindowVirtualList ({
     }
   }, [virtualItems, count, totalHeight, container])
 
-
   useEffect(function updateVirtualSpaceEffect () {
     updateVirtualSpace()
   }, [updateVirtualSpace])
