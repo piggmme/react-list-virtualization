@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useState } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import useWindowVirtualList from './useWindowVirtualList'
 
 const LoremIpsums = [
@@ -14,7 +14,7 @@ const LoremIpsums = [
   '선거에 관한 경비는 법률이 정하는 경우를 제외하고는 정당 또는 후보자에게 부담시킬 수 없다. 대통령은 조국의 평화적 통일을 위한 성실한 의무를 진다. 재판의 전심절차로서 행정심판을 할 수 있다. 행정심판의 절차는 법률로 정하되, 사법절차가 준용되어야 한다. 모든 국민은 법률이 정하는 바에 의하여 공무담임권을 가진다. 대법원장은 국회의 동의를 얻어 대통령이 임명한다. 국가는 사회보장·사회복지의 증진에 노력할 의무를 진다. 대법원에 대법관을 둔다. 다만, 법률이 정하는 바에 의하여 대법관이 아닌 법관을 둘 수 있다. 국회나 그 위원회의 요구가 있을 때에는 국무총리·국무위원 또는 정부위원은 출석·답변하여야 하며, 국무총리 또는 국무위원이 출석요구를 받은 때에는 국무위원 또는 정부위원으로 하여금 출석·답변하게 할 수 있다.',
 ]
 
-const mockData = Array.from({ length: 100 }, (_, i) => i + LoremIpsums[i % LoremIpsums.length])
+const mockData = Array.from({ length: 1000 }, (_, i) => i + LoremIpsums[i % LoremIpsums.length])
 
 export default function WindowVirtualList () {
   const [text, setText] = useState('')
@@ -49,6 +49,8 @@ export default function WindowVirtualList () {
         })}>update</button>
       </div>
 
+
+
       <div style={{ paddingBottom: '60px' }}>
         This is a test of list virtualization in window. The list below should be able to handle a large number of items without slowing down.
       </div>
@@ -60,49 +62,59 @@ export default function WindowVirtualList () {
 }
 
 function List ({ list }: { list: typeof mockData }) {
-  const { containerRef, measureElement, totalHeight, virtualItems } = useWindowVirtualList({ count: list.length, gap: 10 })
+  const { containerRef, measureElement, totalHeight, virtualItems, moveTo } = useWindowVirtualList({ count: list.length, gap: 10 })
+  const [hash, setHash] = useState<number>(0)
 
   return (
-    <div
-      style={{
-        width: '600px',
-        overflow: 'auto',
-        border: '1px solid black',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-      }}
-      ref={containerRef}
-    >
-      <Logger position='left'>
-        <div>totalHeight: {totalHeight}</div>
-      </Logger>
+    <div>
+      <div>
+        hash: <input type='number' value={hash} onChange={e => setHash(Number(e.target.value))} />
+        <button onClick={() => {
+          moveTo(item => item.index === hash)
+        }}>이동</button>
+      </div>
+      <div
+        style={{
+          width: '600px',
+          overflow: 'auto',
+          border: '1px solid black',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+        }}
+        ref={containerRef}
+      >
+        <Logger position='left'>
+          <div>totalHeight: {totalHeight}</div>
+        </Logger>
 
-      {
-        virtualItems.map(({ size, start, end, index }) => (
-          <div
-            ref={measureElement}
-            key={index}
-            data-index={index}
-            style={{
-              border: '1px solid red',
-              padding: '10px',
-              position: 'relative',
-              minHeight: '100px',
-            }}
-          >
-            <Logger>
-              <div>index: {index}</div>
-              <div>size: {size}</div>
-              <div>start: {start}</div>
-              <div>end: {end}</div>
-            </Logger>
-            <h2>{index}.</h2>
-            {list[index]}
-          </div>
-        ))
-      }
+        {
+          virtualItems.map(({ size, start, end, index }) => (
+            <div
+              ref={measureElement}
+              key={index}
+              data-index={index}
+              style={{
+                border: '1px solid red',
+                padding: '10px',
+                position: 'relative',
+                minHeight: '100px',
+                backgroundColor: hash === index ? 'yellow' : 'white',
+              }}
+            >
+              <Logger>
+                <div>index: {index}</div>
+                <div>size: {size}</div>
+                <div>start: {start}</div>
+                <div>end: {end}</div>
+              </Logger>
+              <h2>{index}.</h2>
+              {list[index]}
+            </div>
+          ))
+        }
+      </div>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { flushSync } from 'react-dom'
 
 const OVER_SCAN = 5
 
@@ -161,11 +162,46 @@ export default function useWindowVirtualList ({
     }
   }, [virtualItems, count, totalHeight, container])
 
+  const findItem = (condition: (item: VirtualListItem) => boolean) => {
+    return items.find(condition)
+  }
+
+  const updateVirtualItems = (start: number) => {
+    const end = start + window.innerHeight
+
+    const newVirtualItems = items.filter((item) => {
+      return item.end > start && item.start < end
+    })
+
+    if (newVirtualItems.length === 0) return
+
+    const overScanedVirtualItems = items.slice(
+      Math.max(0, newVirtualItems[0].index - overscan),
+      Math.min(count, newVirtualItems[newVirtualItems.length - 1].index + 1 + overscan),
+    )
+
+    setVirtualItems(overScanedVirtualItems)
+  }
+
+
+  const moveTo = (condition: (item: VirtualListItem) => boolean) => {
+    const target = findItem(condition)
+    if (!target) return
+
+    flushSync(() => updateVirtualItems(target.start))
+
+    window.scrollTo({
+      top: target.start,
+      behavior: 'instant',
+    })
+  }
+
   return {
     containerRef,
     measureElement,
     totalHeight,
     virtualItems: virtualItems.length === 0 ? items : virtualItems,
+    moveTo,
   }
 }
 
