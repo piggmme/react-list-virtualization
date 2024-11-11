@@ -84,7 +84,6 @@ export default function useWindowVirtualList ({
     const index = Number((node as HTMLElement).dataset.index)
     const size = node.getBoundingClientRect().height
 
-    if (size === 0) return
     if (measuredItems[index].size === size) return
 
     setMeasuredItems((prevItems) => {
@@ -145,7 +144,7 @@ export default function useWindowVirtualList ({
     }
   }, [items, count, overscan])
 
-  useEffect(function updateVirtualSpace () {
+  const updateVirtualSpace = useCallback(() => {
     if (virtualItems.length === count) return
     if (!container._ref || !container._virtualFrontSpace || !container._virtualFrontSpace) return
 
@@ -163,6 +162,11 @@ export default function useWindowVirtualList ({
       virtualBackSpace.style.display = isLast ? 'none' : 'block'
     }
   }, [virtualItems, count, totalHeight, container])
+
+
+  useEffect(function updateVirtualSpaceEffect () {
+    updateVirtualSpace()
+  }, [updateVirtualSpace])
 
   const findItem = (condition: (item: VirtualListItem) => boolean) => {
     return items.find(condition)
@@ -189,7 +193,10 @@ export default function useWindowVirtualList ({
     const target = findItem(condition)
     if (!target) return
 
-    flushSync(() => updateVirtualItems(target.start))
+    flushSync(() => {
+      updateVirtualItems(target.start)
+      updateVirtualSpace()
+    })
 
     window.scrollTo({
       top: target.start,
