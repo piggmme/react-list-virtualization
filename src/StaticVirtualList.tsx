@@ -19,12 +19,38 @@ const mockData = Array.from({ length: 1000 }, (_, i) => LoremIpsums[i % LoremIps
 export default function StaticVirtualList () {
   const [text, setText] = useState('')
   const [list, setList] = useState(mockData)
+  const [index, setIndex] = useState(0)
+
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setList(prev => [...prev.slice().sort(() => Math.random() - 0.5)])
+  //   }, 2000)
+
+  //   return () => {
+  //     clearInterval(timer)
+  //   }
+  // }, [setList])
 
   return (
     <div>
       <h2>Static</h2>
-      <textarea value={text} onChange={e => setText(e.target.value)} />
-      <button onClick={() => setList(prev => [text, ...prev])}>submit</button>
+      <div>
+        <textarea value={text} onChange={e => setText(e.target.value)} />
+        <button onClick={() => setList(prev => [text, ...prev])}>submit</button>
+      </div>
+
+      <div>
+        <input type='number' value={index} onChange={e => setIndex(Number(e.target.value))} />
+        <textarea value={text} onChange={e => setText(e.target.value)} />
+        <button onClick={() => setList((prev) => {
+          const next = prev.slice()
+          next[index] = text
+          return next
+        })}
+        >update
+        </button>
+      </div>
+
       <div style={{ paddingBottom: '60px' }}>
         This is a test of list virtualization in window. The list below should be able to handle a large number of items without slowing down.
       </div>
@@ -42,52 +68,65 @@ function List ({ list }: { list: typeof mockData }) {
     virtualItems,
     virtualFrontSpaceRef,
     virtualBackSpaceRef,
-  } = useVirtualList({ count: list.length, })
-  return (
-    <div
-      style={{
-        width: '600px',
-        height: '600px',
-        overflow: 'scroll',
-        border: '1px solid blue',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        // gap: '10px',
-      }}
-      ref={containerRef}
-    >
-      <Logger position='left'>
-        <div>totalHeight: {totalHeight}</div>
-      </Logger>
+    moveTo,
+  } = useVirtualList({ count: list.length, gap: 10 })
+  const [hash, setHash] = useState<number>(0)
 
-      <div ref={virtualFrontSpaceRef}></div>
-      {
-        virtualItems.map(({ index, size, start, end }) => (
-          <div
-            ref={measureElement}
-            key={index}
-            data-key={index}
-            style={{
-              border: '1px solid red',
-              padding: '10px',
-              position: 'relative',
-              // minHeight: '100px',
-            }}
-          >
-            <Logger>
-              <div>size: {size}</div>
-              <div>start: {start}</div>
-              <div>end: {end}</div>
-              <div>index: {index}</div>
-            </Logger>
-            <h2>{index}.</h2>
-            {list[index]}
-          </div>
-        ))
-      }
-     <div ref={virtualBackSpaceRef}></div>
-    </div>
+  return (
+    <>
+      <div>
+        hash: <input type='number' value={hash} onChange={e => setHash(Number(e.target.value))} />
+        <button onClick={() => {
+          moveTo(item => item.index === hash)
+        }}
+        >이동
+        </button>
+      </div>
+      <div
+        style={{
+          width: '600px',
+          height: '600px',
+          overflow: 'scroll',
+          border: '1px solid blue',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+        }}
+        ref={containerRef}
+      >
+        <Logger position='left'>
+          <div>totalHeight: {totalHeight}</div>
+        </Logger>
+
+        <div ref={virtualFrontSpaceRef}></div>
+        {
+          virtualItems.map(({ index, size, start, end }) => (
+            <div
+              ref={measureElement}
+              key={index}
+              data-key={index}
+              style={{
+                border: '1px solid red',
+                padding: '10px',
+                position: 'relative',
+                // minHeight: '100px',
+              }}
+            >
+              <Logger>
+                <div>size: {size}</div>
+                <div>start: {start}</div>
+                <div>end: {end}</div>
+                <div>index: {index}</div>
+              </Logger>
+              <h2>{index}.</h2>
+              {list[index]}
+            </div>
+          ))
+        }
+      <div ref={virtualBackSpaceRef}></div>
+      </div>
+    </>
   )
 }
 
