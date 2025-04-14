@@ -131,7 +131,7 @@ export default function useWindowVirtualList ({
 
       const overScanedVirtualItems = items.slice(
         Math.max(0, newVirtualItems[0].index - overscan),
-        Math.min(count, newVirtualItems[newVirtualItems.length - 1].index + 1 + overscan),
+        Math.min(count, newVirtualItems[newVirtualItems.length - 1].index + overscan),
       )
 
       setVirtualItems(overScanedVirtualItems)
@@ -151,14 +151,14 @@ export default function useWindowVirtualList ({
     if (virtualItems[0]) {
       const virtualFrontSpace = container._virtualFrontSpace as HTMLElement
       const isFirst = virtualItems[0].index === 0
-      virtualFrontSpace.style.height = isFirst ? `0px` : `${virtualItems[0].start}px`
+      virtualFrontSpace.style.height = isFirst ? `0px` : `${virtualItems[0].start - container.offset}px`
       virtualFrontSpace.style.display = isFirst ? 'none' : 'block'
     }
 
     if (virtualItems[virtualItems.length - 1]) {
       const virtualBackSpace = container._virtualBackSpace as HTMLElement
       const isLast = virtualItems[virtualItems.length - 1].index === count - 1
-      virtualBackSpace.style.height = isLast ? `0px` : `${totalHeight - virtualItems[virtualItems.length - 1].end}px`
+      virtualBackSpace.style.height = isLast ? `0px` : `${totalHeight - virtualItems[virtualItems.length - 1].end - container.offset}px`
       virtualBackSpace.style.display = isLast ? 'none' : 'block'
     }
   }, [virtualItems, count, totalHeight, container])
@@ -171,7 +171,7 @@ export default function useWindowVirtualList ({
     return items.find(condition)
   }
 
-  const updateVirtualItems = (start: number) => {
+  const updateVirtualItemsStarted = (start: number) => {
     const end = start + window.innerHeight
 
     const newVirtualItems = items.filter((item) => {
@@ -193,7 +193,7 @@ export default function useWindowVirtualList ({
     if (!target) return
 
     flushSync(() => {
-      updateVirtualItems(target.start)
+      updateVirtualItemsStarted(target.start)
       updateVirtualSpace()
     })
 
