@@ -84,7 +84,7 @@ export default function useWindowVirtualList ({
     const index = Number((node as HTMLElement).dataset.index)
     const size = node.getBoundingClientRect().height
 
-    if (measuredItems[index].size === size) return
+    if (measuredItems[index]._ref === node) return
 
     setMeasuredItems((prevItems) => {
       const newItems = prevItems.map((item, i) => {
