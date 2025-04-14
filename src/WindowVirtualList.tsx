@@ -81,7 +81,12 @@ function List ({ list }: { list: typeof mockData }) {
         <h3>Move to certain list item</h3>
         hash: <input type='number' value={hash} onChange={e => setHash(Number(e.target.value))} />
         <button onClick={() => {
-          moveTo(item => item.index === hash)
+          moveTo(
+            item => item.index === hash,
+            target => ({
+              top: target.start - 100,
+            })
+          )
         }}
         >move
         </button>

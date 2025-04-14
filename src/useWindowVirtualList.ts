@@ -188,7 +188,10 @@ export default function useWindowVirtualList ({
     setVirtualItems(overScanedVirtualItems)
   }
 
-  const moveTo = (condition: (item: VirtualListItem) => boolean) => {
+  const moveTo = (
+    condition: (item: VirtualListItem) => boolean,
+    customScrollToOption?: ScrollToOptions | ((target: VirtualListItem) => ScrollToOptions)
+  ) => {
     const target = findItem(condition)
     if (!target) return
 
@@ -197,9 +200,12 @@ export default function useWindowVirtualList ({
       updateVirtualSpace()
     })
 
+    const customOption = typeof customScrollToOption === 'function' ? customScrollToOption?.(target) : customScrollToOption
+
     window.scrollTo({
       top: target.start,
       behavior: 'instant',
+      ...customOption,
     })
   }
 
